@@ -47,13 +47,8 @@ function calculateAngle(dx1: number, dy1: number, dx2: number, dy2: number): Ang
 	return ((phi * 180) / PI + 360) % 360;
 }
 
-function calculateAngle3(start: Vertex, center: Vertex, end: Vertex): Angle {
-	return calculateAngle(
-		start.x - center.x,
-		start.y - center.y,
-		end.x - center.x,
-		end.y - center.y
-	);
+function calculateAngle3(start: Vertex, pivot: Vertex, end: Vertex): Angle {
+	return calculateAngle(start.x - pivot.x, start.y - pivot.y, end.x - pivot.x, end.y - pivot.y);
 }
 
 export function pointLiesOnEdge(point: Vertex, edge: Edge): boolean {
@@ -85,7 +80,7 @@ export function edgesIntersect(edge1: Edge, edge2: Edge): boolean {
 		}
 		const k2 = (end2.y - start2.y) / (end2.x - start2.x);
 		const y = k2 * (x - start2.x) + start2.y;
-            const p = Point(x, y);
+		const p = Point(x, y);
 		const itLiesOnEdge1 = pointLiesOnEdge(p, edge1);
 		const itLiesOnEdge2 = pointLiesOnEdge(p, edge2);
 		return itLiesOnEdge1 && itLiesOnEdge2;
@@ -93,7 +88,7 @@ export function edgesIntersect(edge1: Edge, edge2: Edge): boolean {
 		const x = start2.x; // 2: x = start2.x
 		const k1 = (end1.y - start1.y) / (end1.x - start1.x);
 		const y = k1 * (x - start1.x) + start1.y;
-            const p = Point(x, y);
+		const p = Point(x, y);
 		const itLiesOnEdge1 = pointLiesOnEdge(p, edge1);
 		const itLiesOnEdge2 = pointLiesOnEdge(p, edge2);
 		return itLiesOnEdge1 && itLiesOnEdge2;
@@ -103,10 +98,11 @@ export function edgesIntersect(edge1: Edge, edge2: Edge): boolean {
 		if (k1 == k2) {
 			// parallel edges
 			return false;
-		} else { // FIXME
+		} else {
+			// FIXME
 			const x = (start2.y - start1.y - k2 * start2.x + k1 * start1.x) / (k1 - k2);
 			const y = k1 * (x - start1.x) + start1.y;
-            const p = Point(x, y);
+			const p = Point(x, y);
 			const itLiesOnEdge1 = pointLiesOnEdge(p, edge1);
 			const itLiesOnEdge2 = pointLiesOnEdge(p, edge2);
 			return itLiesOnEdge1 && itLiesOnEdge2;
@@ -177,7 +173,7 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 		// first we want to avoid self-crossing, secondly we prefer convex shape
 		let selfCross = false;
 		let edge1 = { start: v2, end: v0 };
-        let edge: Edge;
+		let edge: Edge;
 		for (let i = 1; !selfCross && i < n - 2; i++) {
 			edge = { start: vertices[i], end: vertices[i + 1] };
 			selfCross = edgesIntersect(edge1, edge);
@@ -187,7 +183,7 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 			edge = { start: vertices[i], end: vertices[i + 1] };
 			selfCross = edgesIntersect(edge2, edge);
 		}
-		console.log('v2: self-crossing = ' + selfCross);
+		// console.log('v2: self-crossing = ' + selfCross);
 		if (selfCross) {
 			vertices.push(v1);
 		} else {
@@ -197,17 +193,18 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 			if (nextAngle2 > 180 || currentAngle2 > 180 || previousAngle2 > 180) {
 				// we prefer convex shape, but v1 can lead to self-crossing
 				selfCross = false;
-				edge1 = { start: v2, end: v0 };
+				edge1 = { start: v1, end: v0 };
 				for (let i = 1; !selfCross && i < n - 2; i++) {
 					edge = { start: vertices[i], end: vertices[i + 1] };
 					selfCross = edgesIntersect(edge1, edge);
 				}
-				edge2 = { start: vp, end: v2 };
+				edge2 = { start: vp, end: v1 };
 				for (let i = 0; !selfCross && i < n - 3; i++) {
 					edge = { start: vertices[i], end: vertices[i + 1] };
 					selfCross = edgesIntersect(edge2, edge);
+					// console.log(`testing v1: edge2 ^ edge(${i}, ${i+1}) = ${selfCross}`);
 				}
-				console.log('v1: self-crossing = ' + selfCross);
+				// console.log('v1: self-crossing = ' + selfCross);
 				if (selfCross) {
 					vertices.push(v2);
 				} else {
@@ -219,6 +216,18 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 		}
 		return vertices;
 	}
+}
+
+export function calculateAngles(vertices: Vertex[]): Angle[] {
+	const n = vertices.length;
+	const angles: Angle[] = [];
+	for (let i = 0; i < n; i++) {
+		const start = vertices[i];
+		const pivot = vertices[(i + 1) % n];
+		const end = vertices[(i + 2) % n];
+		angles.push(calculateAngle3(start, pivot, end));
+	}
+	return angles;
 }
 
 /** Shoelace formula: https://en.wikipedia.org/wiki/Shoelace_formula */
