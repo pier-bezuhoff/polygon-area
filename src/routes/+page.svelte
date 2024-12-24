@@ -1,34 +1,10 @@
 <script lang="ts">
-	interface Polygon {
-		sides: number[]; // side lengths
-		angles: number[]; // angles in degrees, n - 3 are required
-	}
-
-	function calculatePolygonArea(polygon: Polygon): number | null {
-		const n = polygon.sides.length;
-		const justEnoughAngles = polygon.angles.length == n - 3;
-		const anglesAreValid = polygon.angles.every((angle) => !isNaN(angle));
-		const sidesAreValid = polygon.sides.every((side) => side >= 0);
-		if (justEnoughAngles && anglesAreValid && sidesAreValid) {
-			if (n == 3) {
-				const [a, b, c] = polygon.sides;
-				const p = (a + b + c) / 2;
-				const area = Math.sqrt(p * (p - a) * (p - b) * (p - c));
-				if (isNaN(area)) {
-					return null;
-				} else {
-					return area; // .toFixed(2)
-				}
-			}
-			return 0; // stub
-		} else {
-			return null;
-		}
-	}
+	import type { Index, Size, Polygon, Vertex, Area } from '$lib/types';
+	import { calculatePolygonArea, calculatePolygonVertices, calculateArea } from '$lib/geometry';
 
 	const latinLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-	function mkSideName(i: number, size: number): string {
+	function mkSideName(i: Index, size: Size): string {
 		const startLetter = latinLetter[i];
 		const endLetter = latinLetter[(i + 1) % size];
 		return startLetter + endLetter;
@@ -39,8 +15,8 @@
 		angles: []
 	};
 	let polygon: Polygon = $state(defaultPolygon);
-	let nSides = $derived(polygon.sides.length);
-	let area = $derived(calculatePolygonArea(polygon));
+	let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon));
+	let area: Area | null = $derived(calculateArea(vertices)); //$derived(calculatePolygonArea(polygon));
 </script>
 
 <main>
@@ -55,7 +31,21 @@
 	{/each}
 	{#if area !== null}
 		<div class="result">
-			<h2>Area = {area.toFixed(3)}</h2>
+			<h2>Area = {area.toPrecision(4)}</h2>
 		</div>
 	{/if}
 </main>
+
+<style>
+	/* Hide arrows on number inputs */
+	/* Chrome, Safari, Edge, Opera */
+	:global(input::-webkit-outer-spin-button),
+	:global(input::-webkit-inner-spin-button) {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	/* Firefox */
+	:global(input[type='number']) {
+		-moz-appearance: textfield;
+	}
+</style>
