@@ -22,7 +22,7 @@
 		angles: []
 	};
 	const defaultPolygon: Polygon = {
-		sides: [6, 8, 10, 5],
+		sides: [6, 8, 10, 5.1],
 		angles: [40]
 	};
 	let polygon: Polygon = $state(defaultPolygon);
