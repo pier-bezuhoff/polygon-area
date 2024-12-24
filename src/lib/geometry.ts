@@ -183,7 +183,6 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 			edge = { start: vertices[i], end: vertices[i + 1] };
 			selfCross = edgesIntersect(edge2, edge);
 		}
-		// console.log('v2: self-crossing = ' + selfCross);
 		if (selfCross) {
 			vertices.push(v1);
 		} else {
@@ -202,9 +201,7 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
 				for (let i = 0; !selfCross && i < n - 3; i++) {
 					edge = { start: vertices[i], end: vertices[i + 1] };
 					selfCross = edgesIntersect(edge2, edge);
-					// console.log(`testing v1: edge2 ^ edge(${i}, ${i+1}) = ${selfCross}`);
 				}
-				// console.log('v1: self-crossing = ' + selfCross);
 				if (selfCross) {
 					vertices.push(v2);
 				} else {

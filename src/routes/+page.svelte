@@ -36,7 +36,6 @@
     }
     return allAngles;
   });
-  $inspect(vertices);
   let area: Area | null = $derived(
     vertices.length != polygon.sides.length ? null : Math.abs(calculateArea(vertices)), // negative area can spook ppl i suppose
   );
@@ -110,9 +109,13 @@
 <!-- TODO: nicer buttons + dark/light mode toggle -->
 
 <svelte:head>
-  <title>Polygon Area Calculator</title>
-  <meta name="description" content="Calculate area of any polygon by its sides and some angles." />
+  <title>Polygon Area Online Calculator</title>
+  <meta
+    name="description"
+    content="Calculate area of any polygon by its sides and some angles with picture | Free Online Calculator & Vizualizer for Arbitrary Polygons"
+  />
   <link href="https://fonts.googleapis.com/css?family=Noto Sans Math" rel="stylesheet" />
+  <meta name="google-site-verification" content="yKOpXb8Zc0SJds3eFMCCXDqQp52QWU2oVZR0exhXWxU" />
 </svelte:head>
 <main>
   <div class="row">
