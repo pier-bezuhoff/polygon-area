@@ -38,7 +38,7 @@
 	});
 	$inspect(vertices);
 	let area: Area | null = $derived(
-		vertices.length != polygon.sides.length ? null : calculateArea(vertices)
+		vertices.length != polygon.sides.length ? null : Math.abs(calculateArea(vertices)) // negative area can spook ppl i suppose
 	);
 
 	let canvas: HTMLCanvasElement;
@@ -83,8 +83,9 @@
 					context.closePath();
 				}
 				context.stroke();
-				context.fillStyle = '#404040';
-				context.font = '24px Noto Sans Math';
+				/* context.fillStyle = '#404040'; */
+				/* context.font = '24px Noto Sans Math'; */
+				context.font = '20px Arial';
 				for (let i = 0; i < vertices.length; i++) {
 					v = vertices[i];
 					x = canvasCenterX + (v.x - centerX) * scaleFactor;
@@ -94,6 +95,16 @@
 			}
 		}
 	});
+
+	function addSide() {
+		polygon.angles.push(angles[polygon.angles.length]);
+		polygon.sides.push(0);
+	}
+
+	function deleteSide() {
+		polygon.sides.pop();
+		polygon.angles.pop();
+	}
 </script>
 
 <svelte:head>
@@ -131,10 +142,14 @@
 						</div>
 					</div>
 				{/each}
+				<div class="buttons">
+					<button type="button" onclick={addSide}>+</button>
+					<button type="button" onclick={deleteSide}>-</button>
+				</div>
 				{#if area != null}
 					<hr class="result-separator" />
 					<div class="result">
-						<h2>Area = <em class="actual-area">{area.toPrecision(4)}</em></h2>
+						<h2>Area <i>S</i> = <i class="actual-area">{area.toPrecision(4)}</i></h2>
 					</div>
 				{/if}
 			</div>
@@ -175,13 +190,12 @@
 	}
 
 	input[type='number'] {
-		width: 50px;
+		width: 60px;
 	}
 
 	.row {
 		display: flex;
 		flex-direction: row;
-		align-items: center;
 		justify-content: center;
 	}
 
@@ -201,6 +215,9 @@
 
 	.right-column {
 		width: 40%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
 
 	.entry-row {
@@ -224,6 +241,18 @@
 
 	.side-input {
 		color: var(--primary-color);
+	}
+
+	.buttons {
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+		margin-top: 24px;
+	}
+
+	button {
+		margin-right: 16px;
+		font-size: 24px;
 	}
 
 	.result-separator {
