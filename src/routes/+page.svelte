@@ -27,13 +27,31 @@
     return `∠${pivotLetter} = ∠${startLetter}${pivotLetter}${endLetter} =`;
   }
 
-  const defaultPolygon1: Polygon = {
-    sides: [6, 8, 10],
-    angles: [],
-  };
+  function setColorScheme(isLight: boolean) {
+    const root = document.querySelector(':root');
+    const scheme = isLight ? 'light' : 'dark';
+    root.style.setProperty('color-scheme', scheme);
+  }
+
+  let lightScheme: boolean = $state(true);
+  $effect(() => {
+    // load / guess preffered scheme
+    const locallySavedLightScheme = localStorage.getItem('lightScheme');
+    if (locallySavedLightScheme != null) {
+      lightScheme = locallySavedLightScheme === 'true';
+    } else {
+      const darkIsPreferred = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true;
+      lightScheme = !darkIsPreferred;
+    }
+  });
+  $effect(() => {
+    const newLight = lightScheme; // lightScheme update hook
+    setColorScheme(newLight);
+    localStorage.setItem('lightScheme', newLight);
+  });
   const defaultPolygon: Polygon = {
-    sides: [6, 8, 10, 5.1],
-    angles: [40],
+    sides: [6, 8, 10, 5],
+    angles: [70],
   };
   let polygon: Polygon = $state(defaultPolygon);
   let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon));
@@ -57,7 +75,7 @@
       const context = canvas.getContext('2d')!;
       const w = canvas.width;
       const h = canvas.height;
-      context.strokeStyle = '#000000';
+      context.strokeStyle = lightScheme ? '#000000' : '#ffffff';
       context.clearRect(0, 0, w, h);
       context.beginPath();
       context.moveTo(0, 0);
@@ -75,8 +93,7 @@
           paddedK * w,
           paddedK * h,
         );
-        $inspect(centerX, centerY, scaleFactor);
-        context.strokeStyle = '#670099';
+        context.strokeStyle = lightScheme ? '#8800cc' : '#bb33ff'; // based on hsl(280, 100, 60)
         context.beginPath();
         let v = vertices[0]; // we are center-ing and scaling our polygon
         let x = canvasCenterX + (v.x - centerX) * scaleFactor;
@@ -92,7 +109,7 @@
           context.closePath();
         }
         context.stroke();
-        /* context.fillStyle = '#404040'; */
+        context.fillStyle = lightScheme ? '#000000' : '#ffffff';
         /* context.font = '24px Noto Sans Math'; */
         context.font = '20px Arial';
         for (let i = 0; i < vertices.length; i++) {
@@ -127,9 +144,13 @@
       }
     }
   }
+
+  function toggleColorScheme() {
+    lightScheme = !lightScheme;
+  }
 </script>
 
-<!-- TODO: nicer buttons + dark/light mode toggle -->
+<!-- -->
 
 <svelte:head>
   <title>Polygon Area Online Calculator</title>
@@ -176,6 +197,9 @@
           <button type="button" class="control-button" onclick={toRegularPolygon}
             >Regular polygon</button
           >
+          <button type="button" class="control-button" onclick={toggleColorScheme}
+            >Light/Dark</button
+          >
         </div>
         {#if area != null}
           <hr class="result-separator" />
@@ -197,7 +221,14 @@
 
 <style>
   :root {
-    --primary-color: hsl(280, 100%, 30%); /* #670099 */
+    color-scheme: light dark;
+    --accent-color-light: hsl(280, 100%, 50%);
+    --accent-color-dark: hsl(280, 100%, 60%);
+    --text-color: light-dark(black, white);
+    --bg-color: light-dark(white, rgb(31, 31, 31));
+    --accent-color: light-dark(var(--accent-color-light), var(--accent-color-dark));
+    color: var(--text-color);
+    background-color: var(--bg-color);
   }
   /* Hide arrows on number inputs */
   /* Chrome, Safari, Edge, Opera */
@@ -283,7 +314,7 @@
   }
 
   .side-input {
-    color: var(--primary-color);
+    color: var(--accent-color);
   }
 
   .buttons-row {
@@ -301,8 +332,8 @@
   .result-separator {
     float: left;
     width: 100%;
-    margin-top: 36px;
-    margin-bottom: 24px;
+    margin-top: 30px;
+    margin-bottom: 30px;
   }
 
   .result-wrap {
@@ -311,6 +342,7 @@
   .actual-area {
     border: solid;
     border-radius: 12px;
+    border-color: var(--accent-color);
     padding-left: 4px;
     padding-right: 12px;
   }
@@ -323,6 +355,6 @@
   }
 
   canvas {
-    width: 80%;
+    width: 90%;
   }
 </style>
