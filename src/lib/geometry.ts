@@ -110,10 +110,13 @@ export function edgesIntersect(edge1: Edge, edge2: Edge): boolean {
 }
 
 export function polygonIsValid(polygon: Polygon): boolean {
+  if (!Object.hasOwn(polygon, 'sides')) {
+      return false;
+  }
   const n = polygon.sides.length;
-  const justEnoughAngles = polygon.angles.length == n - 3;
-  const anglesAreValid = polygon.angles.every((angle) => !isNaN(angle));
-  const sidesAreValid = polygon.sides.every((side) => side >= 0);
+  const justEnoughAngles = polygon.angles?.length === n - 3;
+  const anglesAreValid = polygon.angles?.every((angle) => !isNaN(angle));
+  const sidesAreValid = polygon.sides?.every((side) => side >= 0);
   return justEnoughAngles && anglesAreValid && sidesAreValid;
 }
 

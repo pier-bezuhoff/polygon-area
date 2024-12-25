@@ -7,6 +7,7 @@
     calculateArea,
     calculateFitInScaling,
     calculateRegularPolygonAngle,
+    polygonIsValid,
   } from '$lib/geometry';
 
   const latinLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -54,6 +55,19 @@
     angles: [70],
   };
   let polygon: Polygon = $state(defaultPolygon);
+  $effect(() => {
+    const locallySavedPolygon = localStorage.getItem('polygon');
+    if (locallySavedPolygon) {
+      const parsed = JSON.parse(locallySavedPolygon);
+      if (polygonIsValid(parsed)) {
+        polygon = parsed;
+      }
+    }
+  });
+  $effect(() => {
+    const newPolygon = polygon;
+    localStorage.setItem('polygon', JSON.stringify(newPolygon));
+  });
   let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon));
   let angles: Angle[] = $derived.by(() => {
     const allAngles = calculateAngles(vertices);
