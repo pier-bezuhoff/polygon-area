@@ -162,10 +162,8 @@
   <meta name="google-site-verification" content="yKOpXb8Zc0SJds3eFMCCXDqQp52QWU2oVZR0exhXWxU" />
 </svelte:head>
 <main>
-  <button
-    type="button"
-    class="light-dark-toggle {lightScheme ? 'light-state' : 'dark-state'}"
-    onclick={toggleColorScheme}></button
+  <button type="button" class="light-dark-toggle" onclick={toggleColorScheme}
+    >{@html lightScheme ? '&#9728;' : '&#127768;'}</button
   >
   <div class="row">
     <div class="left-column">
@@ -364,15 +362,12 @@
     position: relative;
     top: 0px;
     float: right;
+    font-size: 30px;
+    background-color: transparent;
+    border: none;
   }
 
-  .light-state {
-    background-image: url('sun.svg');
-    background-repeat: no-repeat;
-  }
-
-  .dark-state {
-    background-image: url('moon.svg');
-    background-repeat: no-repeat;
+  .light-dark-toggle:hover {
+    filter: brightness(150%);
   }
 </style>
