@@ -164,7 +164,7 @@
   }
 </script>
 
-<!-- -->
+<!-- TODO: mobile layout -->
 
 <svelte:head>
   <title>Polygon Area Online Calculator</title>
