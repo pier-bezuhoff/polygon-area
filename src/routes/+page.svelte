@@ -162,6 +162,11 @@
   <meta name="google-site-verification" content="yKOpXb8Zc0SJds3eFMCCXDqQp52QWU2oVZR0exhXWxU" />
 </svelte:head>
 <main>
+  <button
+    type="button"
+    class="light-dark-toggle {lightScheme ? 'light-state' : 'dark-state'}"
+    onclick={toggleColorScheme}></button
+  >
   <div class="row">
     <div class="left-column">
       <div class="calcs">
@@ -196,9 +201,6 @@
           >
           <button type="button" class="control-button" onclick={toRegularPolygon}
             >Regular polygon</button
-          >
-          <button type="button" class="control-button" onclick={toggleColorScheme}
-            >Light/Dark</button
           >
         </div>
         {#if area != null}
@@ -249,7 +251,7 @@
   }
 
   main {
-    padding: 24px;
+    margin: 24px;
   }
 
   input[type='number'] {
@@ -356,5 +358,21 @@
 
   canvas {
     width: 90%;
+  }
+
+  .light-dark-toggle {
+    position: relative;
+    top: 0px;
+    float: right;
+  }
+
+  .light-state {
+    background-image: url('sun.svg');
+    background-repeat: no-repeat;
+  }
+
+  .dark-state {
+    background-image: url('moon.svg');
+    background-repeat: no-repeat;
   }
 </style>
