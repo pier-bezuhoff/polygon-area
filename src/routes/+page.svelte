@@ -6,6 +6,7 @@
     calculateAngles,
     calculateArea,
     calculateFitInScaling,
+    calculateRegularPolygonAngle,
   } from '$lib/geometry';
 
   const latinLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -15,6 +16,15 @@
     const startLetters = latinLetters[i];
     const endLetters = latinLetters[(i + 1) % size];
     return startLetters + endLetters;
+  }
+
+  function mkAngleName(i: Index, size: Size): string {
+    const j = (i + 1) % size;
+    const k = (i + 2) % size;
+    const startLetter = latinLetters[i];
+    const pivotLetter = latinLetters[j];
+    const endLetter = latinLetters[k];
+    return `∠${pivotLetter} = ∠${startLetter}${pivotLetter}${endLetter} =`;
   }
 
   const defaultPolygon1: Polygon = {
@@ -96,13 +106,26 @@
   });
 
   function addSide() {
-    polygon.angles.push(angles[polygon.angles.length]);
-    polygon.sides.push(0);
+    const firstNonInputAngle = angles[polygon.angles.length];
+    polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)));
+    polygon.sides.push(1);
   }
 
   function deleteSide() {
     polygon.sides.pop();
     polygon.angles.pop();
+  }
+
+  function toRegularPolygon() {
+    const n = polygon.sides.length;
+    const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2));
+    const sideLength = polygon.sides[0] ?? 1;
+    for (let i = 0; i < n; i++) {
+      polygon.sides[i] = sideLength;
+      if (i < polygon.angles.length) {
+        polygon.angles[i] = angle;
+      }
+    }
   }
 </script>
 
@@ -120,48 +143,53 @@
 <main>
   <div class="row">
     <div class="left-column">
-      <div class="entries">
-        <h1>Polygon Area Calculator</h1>
-        {#each polygon.sides as side, i}
-          <div class="entry-row">
-            <div class="side-entry">
-              <label>
-                |{mkSideName(i, polygon.sides.length)}| =
-                <input type="number" class="side-input" bind:value={polygon.sides[i]} />
-              </label>
-            </div>
-            <div class="angle-entry">
-              {#if polygon.angles.length > i}
+      <div class="calcs">
+        <div class="entries">
+          <h1>&#11041; Polygon Area Calculator &#11042;</h1>
+          {#each polygon.sides as side, i}
+            <div class="entry-row">
+              <div class="side-entry">
                 <label>
-                  &angle;{latinLetters[i + 1]} = &angle;{latinLetters[i]}{latinLetters[
-                    i + 1
-                  ]}{latinLetters[i + 2]} =
-                  <input type="number" class="angle-input" bind:value={polygon.angles[i]} />
-                  &deg;
+                  |{mkSideName(i, polygon.sides.length)}| =
+                  <input type="number" class="side-input" bind:value={polygon.sides[i]} />
                 </label>
-              {:else if i < angles.length}
-                &angle;{latinLetters[i + 1]} = &angle;{latinLetters[i]}{latinLetters[
-                  i + 1
-                ]}{latinLetters[i + 2]} = {polygon.angles[i] ?? angles[i].toFixed(2)}&deg;
-              {/if}
+              </div>
+              <div class="angle-entry">
+                {#if polygon.angles.length > i}
+                  <label>
+                    {mkAngleName(i, polygon.sides.length)}
+                    <input type="number" class="angle-input" bind:value={polygon.angles[i]} />
+                    &deg;
+                  </label>
+                {:else if i < angles.length}
+                  {mkAngleName(i, polygon.sides.length)}
+                  {polygon.angles[i] ?? angles[i].toFixed(2)}&deg;
+                {/if}
+              </div>
             </div>
-          </div>
-        {/each}
-        <div class="buttons">
-          <button type="button" onclick={addSide}>+</button>
-          <button type="button" onclick={deleteSide}>-</button>
+          {/each}
+        </div>
+        <div class="buttons-row">
+          <button type="button" class="control-button" onclick={addSide}>Add another side</button>
+          <button type="button" class="control-button" onclick={deleteSide}>Delete last side</button
+          >
+          <button type="button" class="control-button" onclick={toRegularPolygon}
+            >Regular polygon</button
+          >
         </div>
         {#if area != null}
           <hr class="result-separator" />
-          <div class="result">
-            <h2>Area <i>S</i> = <i class="actual-area">{area.toPrecision(4)}</i></h2>
+          <div class="result-wrap">
+            <h2>Area <i>S</i> = <i class="actual-area">{area.toPrecision(6)}</i></h2>
           </div>
         {/if}
       </div>
     </div>
     {#if vertices != null}
       <div class="right-column">
-        <canvas bind:this={canvas} width="300" height="300"></canvas>
+        <div class="canvas-wrap">
+          <canvas bind:this={canvas} width="300" height="300"></canvas>
+        </div>
       </div>
     {/if}
   </div>
@@ -191,7 +219,6 @@
 
   main {
     padding: 24px;
-    height: 100%;
   }
 
   input[type='number'] {
@@ -206,23 +233,31 @@
 
   .left-column,
   .right-column {
-    height: 100%;
     padding: 12px;
   }
 
   .left-column {
-    width: 60%;
+    width: 50%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: end;
+    justify-content: top;
   }
 
   .right-column {
-    width: 40%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .calcs {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .entries {
+    /* margin-left: 8px; */
   }
 
   .entry-row {
@@ -233,14 +268,17 @@
   .side-entry,
   .angle-entry {
     float: left;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding: 8px;
+  }
+
+  .side-entry {
+    padding-left: 0px;
   }
 
   /* staggered columns effect */
   .angle-entry {
     position: relative;
-    top: 16px;
+    top: 18px;
     margin-left: 16px;
   }
 
@@ -248,16 +286,16 @@
     color: var(--primary-color);
   }
 
-  .buttons {
+  .buttons-row {
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: start;
     margin-top: 24px;
   }
 
-  button {
+  .control-button {
     margin-right: 16px;
-    font-size: 24px;
+    font-size: 16px;
   }
 
   .result-separator {
@@ -267,8 +305,7 @@
     margin-bottom: 24px;
   }
 
-  .result {
-    float: left;
+  .result-wrap {
   }
 
   .actual-area {
@@ -276,5 +313,16 @@
     border-radius: 12px;
     padding-left: 4px;
     padding-right: 12px;
+  }
+
+  .canvas-wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    padding: 48px;
+  }
+
+  canvas {
+    width: 80%;
   }
 </style>
