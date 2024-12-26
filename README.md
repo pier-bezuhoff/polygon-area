@@ -4,7 +4,7 @@ The site: [pier-bezuhoff.github.io/polygon-area](https://pier-bezuhoff.github.io
 
 ## Features
 - Arbitrary N-polygons with arbitrary side lengths
-- Minimal neccessary number of paramteres (sides + angles)
+- Minimum parameteres (sides + angles)
 - All non-specified angles are also calculated
 - Visualized
 - Regular polygons

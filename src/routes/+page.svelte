@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { Index, Size, Polygon, Vertex, Angle, Area } from '$lib/types';
   import {
     calculatePolygonVertices,
@@ -19,6 +18,7 @@
     return startLetters + endLetters;
   }
 
+  /** e.g. 0 -> ABC, 1 -> BCA, 2 -> CAB when size = 3 */
   function mkAngleName(i: Index, size: Size): string {
     const j = (i + 1) % size;
     const k = (i + 2) % size;
@@ -36,7 +36,7 @@
 
   let lightScheme: boolean = $state(true);
   $effect(() => {
-    // load / guess preffered scheme
+    // load / guess preferred scheme
     const locallySavedLightScheme = localStorage.getItem('lightScheme');
     if (locallySavedLightScheme != null) {
       lightScheme = locallySavedLightScheme === 'true';
@@ -170,9 +170,16 @@
   <title>Polygon Area Online Calculator</title>
   <meta
     name="description"
-    content="Calculate area of any polygon by its sides and some angles with picture | Free Online Calculator & Vizualizer for Arbitrary Polygons"
+    content="Calculate area of any polygon by its sides and some angles with picture | Free Online Calculator &amp; Vizualizer for Arbitrary Polygons"
   />
-  <link href="https://fonts.googleapis.com/css?family=Noto Sans Math" rel="stylesheet" />
+  <!-- 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap"
+    rel="stylesheet"
+  />
+  -->
   <meta name="google-site-verification" content="yKOpXb8Zc0SJds3eFMCCXDqQp52QWU2oVZR0exhXWxU" />
 </svelte:head>
 <main>
@@ -237,9 +244,11 @@
   :root {
     color-scheme: light dark;
     --accent-color-light: hsl(280, 100%, 50%);
-    --accent-color-dark: hsl(280, 100%, 60%);
+    --accent-color-dark: hsl(280, 100%, 70%);
+    --bg-color-light: white;
+    --bg-color-dark: rgb(31, 31, 31); /* recommmended bg for dark mode */
     --text-color: light-dark(black, white);
-    --bg-color: light-dark(white, rgb(31, 31, 31));
+    --bg-color: light-dark(var(--bg-color-light), var(--bg-color-dark));
     --accent-color: light-dark(var(--accent-color-light), var(--accent-color-dark));
     color: var(--text-color);
     background-color: var(--bg-color);
