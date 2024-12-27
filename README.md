@@ -4,7 +4,7 @@ The site: [pier-bezuhoff.github.io/polygon-area](https://pier-bezuhoff.github.io
 
 ## Features
 - Arbitrary N-polygons with arbitrary side lengths
-- Minimum parameteres (sides + angles)
+- Minimum required parameteres (sides + angles)
 - All non-specified angles are also calculated
 - Visualized
 - Regular polygons
@@ -14,4 +14,5 @@ The site: [pier-bezuhoff.github.io/polygon-area](https://pier-bezuhoff.github.io
 ## NB
 Triangle requires 0 additional angles, quadrilateral — 1, pentagon — 2, hexagon — 3, etc.  
 Out of 2 possible configurations of vertices chosen one without self-crossing edges and preferably convex.  
+When no valid polygon is possible given inputted paramters, it will appear open and no area is returned.
 

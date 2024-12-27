@@ -192,7 +192,7 @@
       aria-label="GitHub Repo"
       class="github-link {lightScheme ? 'github-link-light' : 'github-link-dark'}"
     ></a>
-    <button type="button" class="light-dark-toggle" onclick={toggleColorScheme}>
+    <button type="button" class="light-dark-toggle unselectable" onclick={toggleColorScheme}>
       {@html lightScheme ? '&#9728;' : '&#127768;'}
     </button>
   </div>
@@ -288,6 +288,7 @@
     display: flex;
     flex-direction: row;
     justify-content: end;
+    align-items: center;
     padding: 8px;
     margin-right: 16px;
     gap: 12px;
