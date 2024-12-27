@@ -280,6 +280,8 @@
       var(--button-pressed-bg-color-light),
       var(--button-pressed-bg-color-dark)
     );
+    --default-font-family: 'Noto Sans Math';
+    --default-font-size: 18px;
     color: var(--text-color);
     background-color: var(--bg-color);
   }
@@ -332,8 +334,8 @@
   }
 
   main {
-    font-family: 'Noto Sans Math';
-    font-size: 18px;
+    font-family: var(--default-font-family);
+    font-size: var(--default-font-size);
   }
 
   .row {
@@ -390,8 +392,8 @@
   }
 
   input[type='number'] {
-    font-family: 'Noto Sans Math';
-    font-size: 18px;
+    font-family: var(--default-font-family);
+    font-size: var(--default-font-size);
   }
 
   input[type='number'] {
