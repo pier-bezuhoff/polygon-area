@@ -108,14 +108,15 @@ export function edgesIntersect(edge1: Edge, edge2: Edge): boolean {
   }
 }
 
+// NOTE: that blank sides/angles translate into nulls (+null = 0)
 export function polygonIsValid(polygon: Polygon): boolean {
   if (!Object.hasOwn(polygon, 'sides')) {
     return false
   }
   const n = polygon.sides.length
   const justEnoughAngles = polygon.angles?.length === n - 3
-  const anglesAreValid = polygon.angles?.every((angle) => !isNaN(angle))
-  const sidesAreValid = polygon.sides?.every((side) => side >= 0)
+  const anglesAreValid = polygon.angles?.every((angle) => !isNaN(+angle) && +angle !== 0)
+  const sidesAreValid = polygon.sides?.every((side) => +side >= 0)
   return justEnoughAngles && anglesAreValid && sidesAreValid
 }
 
@@ -133,19 +134,24 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
   if (n == 1) {
     return vertices
   }
-  vertices.push(Point(polygon.sides[0], 0))
+  vertices.push(Point(+polygon.sides[0], 0))
   for (let i = 0; i < polygon.angles.length; i++) {
     const lastVertex = vertices[i]
     const vertex = vertices[i + 1]
     // v = vector from the current vertex to the last
     const vx = lastVertex.x - vertex.x
     const vy = lastVertex.y - vertex.y
-    const k = polygon.sides[i + 1] / hypot(vx, vy)
-    const angle = (-polygon.angles[i] * PI) / 180 // flip angles cuz our xOy is left-handed
-    const dx = k * (vx * cos(angle) - vy * sin(angle))
-    const dy = k * (vx * sin(angle) + vy * cos(angle))
-    const nextVertex = Point(vertex.x + dx, vertex.y + dy)
-    vertices.push(nextVertex)
+    const vv = hypot(vx, vy)
+    if (vv === 0) {
+      vertices.push(vertex)
+    } else {
+      const k = +polygon.sides[i + 1] / vv
+      const angle = (-polygon.angles[i] * PI) / 180 // flip angles cuz our xOy is left-handed
+      const dx = k * (vx * cos(angle) - vy * sin(angle))
+      const dy = k * (vx * sin(angle) + vy * cos(angle))
+      const nextVertex = Point(vertex.x + dx, vertex.y + dy)
+      vertices.push(nextVertex)
+    }
   } // we need to calc & add one last vertex
   const v0 = vertices[0]
   const x1 = v0.x // first vertex
@@ -153,8 +159,8 @@ export function calculatePolygonVertices(polygon: Polygon): Vertex[] {
   const vp = vertices[n - 2] // penultimate vertex
   const x2 = vp.x
   const y2 = vp.y
-  const l1 = polygon.sides[n - 1] // side from 1st to last
-  const l2 = polygon.sides[n - 2] // side from penultimate to last
+  const l1 = +polygon.sides[n - 1] // side from 1st to last
+  const l2 = +polygon.sides[n - 2] // side from penultimate to last
   if (x1 == x2 && y1 == y2) {
     if (l1 == l2) {
       vertices.push(v0)

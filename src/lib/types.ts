@@ -4,6 +4,7 @@ export type SideLength = number // non-negative, non-NaN
 export type Angle = number
 export type Area = number // non-negative, non-NaN
 
+/** sides and angles can be nulls when corresponding inputs are blank. Nulls should be treated as 0 (`+null === 0`) */
 export interface Polygon {
   sides: SideLength[] // side lengths
   angles: Angle[] // angles in degrees, n - 3 are required

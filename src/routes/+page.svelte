@@ -1,5 +1,5 @@
 <script lang="ts">
-  /* import { fade, crossfade } from 'svelte/transition'; */
+  import { fade } from 'svelte/transition'
   import type { Index, Size, Polygon, Vertex, Angle, Area } from '$lib/types'
   import {
     calculatePolygonVertices,
@@ -34,6 +34,8 @@
     const scheme = isLight ? 'light' : 'dark'
     root.style.setProperty('color-scheme', scheme)
   }
+
+  const FADE_DURATION = 200 // milliseconds
 
   let lightScheme: boolean = $state(true)
   $effect(() => {
@@ -70,6 +72,9 @@
     localStorage.setItem('polygon', JSON.stringify(newPolygon))
   })
   let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon))
+  $inspect(polygon, vertices)
+  let lastVertices: Vertex[] = vertices
+  let animatedVertices: Vertex[] = $state([])
   let angles: Angle[] = $derived.by(() => {
     const allAngles = calculateAngles(vertices)
     if (vertices.length != polygon.sides.length) {
@@ -163,6 +168,16 @@
   function toggleColorScheme() {
     lightScheme = !lightScheme
   }
+
+  function animatePolygon(node: Element, params: any) {
+    console.log('A')
+    return {
+      duration: 1000,
+      tick: (t, u) => {
+        console.log('B')
+      },
+    }
+  }
 </script>
 
 <!-- TODO: mobile layout -->
@@ -219,11 +234,15 @@
                     <input type="number" class="angle-input" bind:value={polygon.angles[i]} />
                     &deg;
                   </label>
-                {:else if i < angles.length}
-                  <div>
-                    {mkAngleName(i, polygon.sides.length)}
-                    {polygon.angles[i] ?? angles[i].toFixed(2)}&deg;
-                  </div>
+                {:else}
+                  <!-- do not remove this comment, otherwise #else and #if will be fused when prettified
+                  which messes up fade transition trigger condition -->
+                  {#if i < angles.length}
+                    <div transition:fade={{ duration: FADE_DURATION }}>
+                      {mkAngleName(i, polygon.sides.length)}
+                      {angles[i].toFixed(2)}&deg;
+                    </div>
+                  {/if}
                 {/if}
               </div>
             </div>
@@ -239,7 +258,7 @@
           </button>
         </div>
         {#if area != null}
-          <div class="result-wrap">
+          <div class="result-wrap" transition:fade={{ duration: FADE_DURATION }}>
             <hr class="result-separator" />
             <h2 id="answer">
               Area <i>S</i> = <i class="actual-area">{area.toPrecision(6)}</i>
