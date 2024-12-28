@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Index, Size, Polygon, Vertex, Angle, Area } from '$lib/types';
+  /* import { fade, crossfade } from 'svelte/transition'; */
+  import type { Index, Size, Polygon, Vertex, Angle, Area } from '$lib/types'
   import {
     calculatePolygonVertices,
     calculateAngles,
@@ -7,160 +8,160 @@
     calculateFitInScaling,
     calculateRegularPolygonAngle,
     polygonIsValid,
-  } from '$lib/geometry';
+  } from '$lib/geometry'
 
-  const latinLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const latinLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
   /** e.g. 0 -> AB, 1 -> BC, 2 -> CA when size = 3 */
   function mkSideName(i: Index, size: Size): string {
-    const startLetters = latinLetters[i];
-    const endLetters = latinLetters[(i + 1) % size];
-    return startLetters + endLetters;
+    const startLetters = latinLetters[i]
+    const endLetters = latinLetters[(i + 1) % size]
+    return startLetters + endLetters
   }
 
   /** e.g. 0 -> ABC, 1 -> BCA, 2 -> CAB when size = 3 */
   function mkAngleName(i: Index, size: Size): string {
-    const j = (i + 1) % size;
-    const k = (i + 2) % size;
-    const startLetter = latinLetters[i];
-    const pivotLetter = latinLetters[j];
-    const endLetter = latinLetters[k];
-    return `∠${pivotLetter} = ∠${startLetter}${pivotLetter}${endLetter} =`;
+    const j = (i + 1) % size
+    const k = (i + 2) % size
+    const startLetter = latinLetters[i]
+    const pivotLetter = latinLetters[j]
+    const endLetter = latinLetters[k]
+    return `∠${pivotLetter} = ∠${startLetter}${pivotLetter}${endLetter} =`
   }
 
   function setColorScheme(isLight: boolean) {
-    const root = document.querySelector(':root');
-    const scheme = isLight ? 'light' : 'dark';
-    root.style.setProperty('color-scheme', scheme);
+    const root = document.querySelector(':root')
+    const scheme = isLight ? 'light' : 'dark'
+    root.style.setProperty('color-scheme', scheme)
   }
 
-  let lightScheme: boolean = $state(true);
+  let lightScheme: boolean = $state(true)
   $effect(() => {
     // load / guess preferred scheme
-    const locallySavedLightScheme = localStorage.getItem('lightScheme');
+    const locallySavedLightScheme = localStorage.getItem('lightScheme')
     if (locallySavedLightScheme != null) {
-      lightScheme = locallySavedLightScheme === 'true';
+      lightScheme = locallySavedLightScheme === 'true'
     } else {
-      const darkIsPreferred = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true;
-      lightScheme = !darkIsPreferred;
+      const darkIsPreferred = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches === true
+      lightScheme = !darkIsPreferred
     }
-  });
+  })
   $effect(() => {
-    const newLight = lightScheme; // lightScheme update hook
-    setColorScheme(newLight);
-    localStorage.setItem('lightScheme', newLight);
-  });
+    const newLight = lightScheme // lightScheme update hook
+    setColorScheme(newLight)
+    localStorage.setItem('lightScheme', newLight)
+  })
   const defaultPolygon: Polygon = {
     sides: [6, 8, 10, 5],
     angles: [70],
-  };
-  let polygon: Polygon = $state(defaultPolygon);
+  }
+  let polygon: Polygon = $state(defaultPolygon)
   $effect(() => {
-    const locallySavedPolygon = localStorage.getItem('polygon');
+    const locallySavedPolygon = localStorage.getItem('polygon')
     if (locallySavedPolygon) {
-      const parsed = JSON.parse(locallySavedPolygon);
+      const parsed = JSON.parse(locallySavedPolygon)
       if (polygonIsValid(parsed)) {
-        polygon = parsed;
+        polygon = parsed
       }
     }
-  });
+  })
   $effect(() => {
-    const newPolygon = polygon;
-    localStorage.setItem('polygon', JSON.stringify(newPolygon));
-  });
-  let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon));
+    const newPolygon = polygon
+    localStorage.setItem('polygon', JSON.stringify(newPolygon))
+  })
+  let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon))
   let angles: Angle[] = $derived.by(() => {
-    const allAngles = calculateAngles(vertices);
+    const allAngles = calculateAngles(vertices)
     if (vertices.length != polygon.sides.length) {
       // last vertex is missing
-      allAngles.pop();
-      allAngles.pop();
+      allAngles.pop()
+      allAngles.pop()
     }
-    return allAngles;
-  });
+    return allAngles
+  })
   let area: Area | null = $derived(
     vertices.length != polygon.sides.length ? null : Math.abs(calculateArea(vertices)), // negative area can spook ppl i suppose
-  );
+  )
 
-  let canvas: HTMLCanvasElement;
-  const canvasPaddingPercent = 20;
+  let canvas: HTMLCanvasElement
+  const canvasPaddingPercent = 20
   $effect(() => {
     if (canvas != undefined) {
-      const context = canvas.getContext('2d')!;
-      const w = canvas.width;
-      const h = canvas.height;
-      context.strokeStyle = lightScheme ? '#000000' : '#ffffff';
-      context.clearRect(0, 0, w, h);
-      context.beginPath();
-      context.moveTo(0, 0);
-      context.lineTo(w, 0);
-      context.lineTo(w, h);
-      context.lineTo(0, h);
-      context.closePath();
-      context.stroke();
+      const context = canvas.getContext('2d')!
+      const w = canvas.width
+      const h = canvas.height
+      context.strokeStyle = lightScheme ? '#000000' : '#ffffff'
+      context.clearRect(0, 0, w, h)
+      context.beginPath()
+      context.moveTo(0, 0)
+      context.lineTo(w, 0)
+      context.lineTo(w, h)
+      context.lineTo(0, h)
+      context.closePath()
+      context.stroke()
       if (vertices != null && vertices.length > 0) {
-        const canvasCenterX = w / 2;
-        const canvasCenterY = h / 2;
-        const paddedK = 1 - canvasPaddingPercent / 100;
+        const canvasCenterX = w / 2
+        const canvasCenterY = h / 2
+        const paddedK = 1 - canvasPaddingPercent / 100
         const { centerX, centerY, scaleFactor } = calculateFitInScaling(
           vertices,
           paddedK * w,
           paddedK * h,
-        );
-        context.strokeStyle = lightScheme ? '#8800cc' : '#bb33ff'; // based on hsl(280, 100, 60)
-        context.beginPath();
-        let v = vertices[0]; // we are center-ing and scaling our polygon
-        let x = canvasCenterX + (v.x - centerX) * scaleFactor;
-        let y = canvasCenterY + (v.y - centerY) * scaleFactor;
-        context.moveTo(x, y);
+        )
+        context.strokeStyle = lightScheme ? '#8800cc' : '#bb33ff' // based on hsl(280, 100, 60)
+        context.beginPath()
+        let v = vertices[0] // we are center-ing and scaling our polygon
+        let x = canvasCenterX + (v.x - centerX) * scaleFactor
+        let y = canvasCenterY + (v.y - centerY) * scaleFactor
+        context.moveTo(x, y)
         for (let i = 1; i < vertices.length; i++) {
-          v = vertices[i];
-          x = canvasCenterX + (v.x - centerX) * scaleFactor;
-          y = canvasCenterY + (v.y - centerY) * scaleFactor;
-          context.lineTo(x, y);
+          v = vertices[i]
+          x = canvasCenterX + (v.x - centerX) * scaleFactor
+          y = canvasCenterY + (v.y - centerY) * scaleFactor
+          context.lineTo(x, y)
         }
         if (vertices.length == polygon.sides.length) {
-          context.closePath();
+          context.closePath()
         }
-        context.stroke();
-        context.fillStyle = lightScheme ? '#000000' : '#ffffff';
+        context.stroke()
+        context.fillStyle = lightScheme ? '#000000' : '#ffffff'
         /* context.font = '24px Noto Sans Math'; */
-        context.font = '20px Arial';
+        context.font = '20px Arial'
         for (let i = 0; i < vertices.length; i++) {
-          v = vertices[i];
-          x = canvasCenterX + (v.x - centerX) * scaleFactor;
-          y = canvasCenterY + (v.y - centerY) * scaleFactor;
-          context.fillText(latinLetters[i], x + 5, y - 5);
+          v = vertices[i]
+          x = canvasCenterX + (v.x - centerX) * scaleFactor
+          y = canvasCenterY + (v.y - centerY) * scaleFactor
+          context.fillText(latinLetters[i], x + 5, y - 5)
         }
       }
     }
-  });
+  })
 
   function addSide() {
-    const firstNonInputAngle = angles[polygon.angles.length];
-    polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)));
-    polygon.sides.push(1);
+    const firstNonInputAngle = angles[polygon.angles.length]
+    polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)))
+    polygon.sides.push(1)
   }
 
   function deleteSide() {
-    polygon.sides.pop();
-    polygon.angles.pop();
+    polygon.sides.pop()
+    polygon.angles.pop()
   }
 
   function toRegularPolygon() {
-    const n = polygon.sides.length;
-    const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2));
-    const sideLength = polygon.sides[0] ?? 1;
+    const n = polygon.sides.length
+    const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2))
+    const sideLength = polygon.sides[0] ?? 1
     for (let i = 0; i < n; i++) {
-      polygon.sides[i] = sideLength;
+      polygon.sides[i] = sideLength
       if (i < polygon.angles.length) {
-        polygon.angles[i] = angle;
+        polygon.angles[i] = angle
       }
     }
   }
 
   function toggleColorScheme() {
-    lightScheme = !lightScheme;
+    lightScheme = !lightScheme
   }
 </script>
 
@@ -200,9 +201,9 @@
 <main>
   <div class="row">
     <div class="left-column">
+      <h1>&#11041; Polygon Area Calculator &#11042;</h1>
       <div class="calcs">
         <div class="entries">
-          <h1>&#11041; Polygon Area Calculator &#11042;</h1>
           {#each polygon.sides as side, i}
             <div class="entry-row">
               <div class="side-entry">
@@ -219,8 +220,10 @@
                     &deg;
                   </label>
                 {:else if i < angles.length}
-                  {mkAngleName(i, polygon.sides.length)}
-                  {polygon.angles[i] ?? angles[i].toFixed(2)}&deg;
+                  <div>
+                    {mkAngleName(i, polygon.sides.length)}
+                    {polygon.angles[i] ?? angles[i].toFixed(2)}&deg;
+                  </div>
                 {/if}
               </div>
             </div>
@@ -236,8 +239,8 @@
           </button>
         </div>
         {#if area != null}
-          <hr class="result-separator" />
           <div class="result-wrap">
+            <hr class="result-separator" />
             <h2 id="answer">
               Area <i>S</i> = <i class="actual-area">{area.toPrecision(6)}</i>
             </h2>
