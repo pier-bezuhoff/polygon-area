@@ -72,9 +72,6 @@
     localStorage.setItem('polygon', JSON.stringify(newPolygon))
   })
   let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon))
-  $inspect(polygon, vertices)
-  let lastVertices: Vertex[] = vertices
-  let animatedVertices: Vertex[] = $state([])
   let angles: Angle[] = $derived.by(() => {
     const allAngles = calculateAngles(vertices)
     if (vertices.length != polygon.sides.length) {
@@ -168,36 +165,9 @@
   function toggleColorScheme() {
     lightScheme = !lightScheme
   }
-
-  function animatePolygon(node: Element, params: any) {
-    console.log('A')
-    return {
-      duration: 1000,
-      tick: (t, u) => {
-        console.log('B')
-      },
-    }
-  }
 </script>
 
 <!-- TODO: mobile layout -->
-
-<svelte:head>
-  <title>Polygon Area Online Calculator</title>
-  <meta
-    name="description"
-    content="Calculate area of any polygon by its sides and some angles with picture | Free Online Calculator &amp; Vizualizer for Arbitrary Polygons"
-  />
-  <!-- Noto Sans Math seems to be pre-installed, so no need to import it
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap"
-    rel="stylesheet"
-  />
-  -->
-  <meta name="google-site-verification" content="yKOpXb8Zc0SJds3eFMCCXDqQp52QWU2oVZR0exhXWxU" />
-</svelte:head>
 <header>
   <div class="top-right-icon-row">
     <a
@@ -267,13 +237,11 @@
         {/if}
       </div>
     </div>
-    {#if vertices != null}
-      <div class="right-column">
-        <div class="canvas-wrap">
-          <canvas bind:this={canvas} width="300" height="300"></canvas>
-        </div>
+    <div class="right-column">
+      <div class="canvas-wrap">
+        <canvas bind:this={canvas} width="300" height="300"></canvas>
       </div>
-    {/if}
+    </div>
   </div>
 </main>
 
