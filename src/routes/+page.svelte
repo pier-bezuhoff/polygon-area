@@ -187,7 +187,7 @@
 <main>
   <div class="row">
     <div class="left-column">
-      <h1>&#11041; Polygon Area Calculator &#11042;</h1>
+      <h1>&#11041;&NonBreakingSpace;Polygon Area Calculator&NonBreakingSpace;&#11042;</h1>
       <div class="calcs">
         <div class="entries">
           <div class="angle-column-filler"></div>
@@ -499,5 +499,45 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+
+  /* on mobile */
+  @media only screen and (max-width: 820px) {
+    h1 {
+      font-size: 1.5em;
+    }
+
+    .row {
+      display: flex;
+      flex-direction: column;
+      justify-content: top;
+      align-items: center;
+    }
+
+    .left-column {
+      width: 100%;
+      height: auto;
+      align-items: center;
+    }
+
+    .calcs {
+      padding-left: 8px;
+      padding-right: 0px;
+    }
+
+    .right-column {
+      width: 100%;
+      height: auto;
+    }
+
+    .canvas-wrap {
+      width: 100%;
+      justify-content: center;
+      padding-left: 0px;
+    }
+
+    canvas {
+      width: 80%;
+    }
   }
 </style>
