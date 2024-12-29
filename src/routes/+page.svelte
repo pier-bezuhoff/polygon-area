@@ -189,34 +189,46 @@
       <h1>&#11041; Polygon Area Calculator &#11042;</h1>
       <div class="calcs">
         <div class="entries">
+          <div class="angle-column-filler"></div>
           {#each polygon.sides as side, i}
-            <div class="entry-row">
-              <div class="side-entry">
-                <label>
-                  |{mkSideName(i, polygon.sides.length)}| =
-                  <input type="number" class="side-input" bind:value={polygon.sides[i]} />
-                </label>
-              </div>
-              <div class="angle-entry">
-                {#if polygon.angles.length > i}
-                  <label>
-                    {mkAngleName(i, polygon.sides.length)}
-                    <input type="number" class="angle-input" bind:value={polygon.angles[i]} />
-                    &deg;
-                  </label>
-                {:else}
-                  <!-- do not remove this comment, otherwise #else and #if will be fused when prettified
+            <label class="side-label" for="side-input-{i}">
+              |{mkSideName(i, polygon.sides.length)}| =
+            </label>
+            <span class="side-value">
+              <input
+                class="side-input"
+                id="side-input-{i}"
+                type="number"
+                bind:value={polygon.sides[i]}
+              />
+            </span>
+            {#if polygon.angles.length > i}
+              <label class="angle-label" for="angle-input-{i}">
+                {mkAngleName(i, polygon.sides.length)}
+              </label>
+              <span class="angle-value">
+                <input
+                  class="angle-input"
+                  id="angle-input-{i}"
+                  type="number"
+                  bind:value={polygon.angles[i]}
+                />
+                &deg;
+              </span>
+            {:else}
+              <!-- do not remove this comment, otherwise #else and #if will be fused when prettified
                   which messes up fade transition trigger condition -->
-                  {#if i < angles.length}
-                    <div transition:fade={{ duration: FADE_DURATION }}>
-                      {mkAngleName(i, polygon.sides.length)}
-                      {angles[i].toFixed(2)}&deg;
-                    </div>
-                  {/if}
-                {/if}
-              </div>
-            </div>
+              {#if i < angles.length}
+                <span class="angle-label" transition:fade={{ duration: FADE_DURATION }}>
+                  {mkAngleName(i, polygon.sides.length)}
+                </span>
+                <span class="angle-value" transition:fade={{ duration: FADE_DURATION }}>
+                  {angles[i].toFixed(2)}&deg;
+                </span>
+              {/if}
+            {/if}
           {/each}
+          <div class="side-column-bottom-filler"></div>
         </div>
         <div class="buttons-row">
           <button type="button" class="control-button" onclick={addSide}> Add another side </button>
@@ -347,26 +359,48 @@
     padding-right: 24px;
   }
 
-  .entry-row {
-    display: flex;
-    flex-direction: row;
+  .entries {
+    display: grid;
+    grid-template-columns: max-content max-content 1em max-content max-content;
+    grid-auto-rows: 1fr;
+    row-gap: 0.5em;
+    column-gap: 0.5em;
   }
 
-  .side-entry,
-  .angle-entry {
-    float: left;
-    padding: 8px;
+  .angle-column-filler {
+    grid-column: 4;
+    grid-column-end: span 2;
+    grid-row: 1;
+    grid-row-end: span 1;
+    width: 1px;
+    height: 1px;
   }
 
-  .side-entry {
-    padding-left: 0px;
+  .side-label {
+    grid-column: 1;
+    grid-row-start: span 2;
   }
 
-  /* staggered columns effect */
-  .angle-entry {
-    position: relative;
-    top: 18px;
-    margin-left: 16px;
+  .side-value {
+    grid-column: 2;
+    grid-row-start: span 2;
+  }
+
+  .angle-label {
+    grid-column: 4;
+    grid-row-start: span 2;
+  }
+
+  .angle-value {
+    grid-column: 5;
+    grid-row-start: span 2;
+  }
+
+  .side-column-bottom-filler {
+    grid-column: 1;
+    grid-column-end: span 1;
+    width: 1px;
+    height: 1px;
   }
 
   /* Hide arrows on number inputs */
@@ -387,7 +421,7 @@
   }
 
   input[type='number'] {
-    width: 60px;
+    width: 3.6em;
   }
 
   .side-input {
@@ -398,7 +432,7 @@
     display: flex;
     flex-direction: row;
     justify-content: start;
-    margin-top: 24px;
+    margin-top: 1em;
   }
 
   .control-button {
@@ -418,14 +452,15 @@
     background-color: var(--button-pressed-bg-color);
   }
 
+  .result-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
+  }
+
   .result-separator {
     float: left;
     width: 100%;
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
-
-  .result-wrap {
   }
 
   .actual-area {
