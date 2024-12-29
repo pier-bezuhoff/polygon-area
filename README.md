@@ -9,6 +9,7 @@ The site: [pier-bezuhoff.github.io/polygon-area](https://pier-bezuhoff.github.io
 - Visualized
 - Regular polygons
 - Light/dark mode
+- Responsive design for mobile
 - Last used parameters are persisted in `localStorage`
 
 ## NB

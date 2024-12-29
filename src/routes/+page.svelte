@@ -10,6 +10,8 @@
     polygonIsValid,
   } from '$lib/geometry'
 
+  // MAYBE: given sides, came up with any angles making up closed polygon
+
   const latinLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
   /** e.g. 0 -> AB, 1 -> BC, 2 -> CA when size = 3 */
