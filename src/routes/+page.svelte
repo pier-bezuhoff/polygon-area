@@ -60,7 +60,11 @@
     sides: [6, 8, 10, 5],
     angles: [70],
   }
-  let polygon: Polygon = $state(defaultPolygon)
+  const lightningBoltPolygon: Polygon = {
+    sides: [1, 2, 1, 3.6, 2, 1, 3],
+    angles: [60, 300, 45, 15],
+  }
+  let polygon: Polygon = $state(lightningBoltPolygon)
   $effect(() => {
     const locallySavedPolygon = localStorage.getItem('polygon')
     if (locallySavedPolygon) {
