@@ -404,7 +404,7 @@
   .label-for-input-wrap {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: start;
     justify-content: end;
     margin-bottom: 0.1em;
   }
