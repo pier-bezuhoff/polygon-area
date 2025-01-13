@@ -99,8 +99,9 @@
       const context = canvas.getContext('2d')!
       const w = canvas.width
       const h = canvas.height
-      context.strokeStyle = lightScheme ? '#000000' : '#ffffff'
+      context.strokeStyle = lightScheme ? '#1f1b14' : '#ebe7e0'
       context.clearRect(0, 0, w, h)
+      context.lineWidth = 5
       context.beginPath()
       context.moveTo(0, 0)
       context.lineTo(w, 0)
@@ -133,9 +134,9 @@
           context.closePath()
         }
         context.stroke()
-        context.fillStyle = lightScheme ? '#000000' : '#ffffff'
+        context.fillStyle = lightScheme ? '#1f1b14' : '#ebe7e0'
         /* context.font = '24px Noto Sans Math'; */
-        context.font = '20px Arial'
+        context.font = '32px Arial'
         for (let i = 0; i < vertices.length; i++) {
           v = vertices[i]
           x = canvasCenterX + (v.x - centerX) * scaleFactor
@@ -198,9 +199,11 @@
         <div class="entries">
           <div class="angle-column-filler"></div>
           {#each polygon.sides as side, i}
-            <label class="side-label" for="side-input-{i}">
-              |{mkSideName(i, polygon.sides.length)}| =
-            </label>
+            <div class="label-for-input-wrap side-label-wrap">
+              <label class="side-label" for="side-input-{i}">
+                |{mkSideName(i, polygon.sides.length)}| =
+              </label>
+            </div>
             <span class="side-value">
               <input
                 class="side-input"
@@ -210,9 +213,11 @@
               />
             </span>
             {#if polygon.angles.length > i}
-              <label class="angle-label" for="angle-input-{i}">
-                {mkAngleName(i, polygon.sides.length)}
-              </label>
+              <div class="label-for-input-wrap angle-label-wrap">
+                <label class="angle-label" for="angle-input-{i}">
+                  {mkAngleName(i, polygon.sides.length)}
+                </label>
+              </div>
               <span class="angle-value">
                 <input
                   class="angle-input"
@@ -226,9 +231,11 @@
               <!-- do not remove this comment, otherwise #else and #if will be fused when prettified
                   which messes up fade transition trigger condition -->
               {#if i < angles.length}
-                <span class="angle-label" transition:fade={{ duration: FADE_DURATION }}>
-                  {mkAngleName(i, polygon.sides.length)}
-                </span>
+                <div class="angle-label-wrap">
+                  <span class="angle-label" transition:fade={{ duration: FADE_DURATION }}>
+                    {mkAngleName(i, polygon.sides.length)}
+                  </span>
+                </div>
                 <span class="angle-value" transition:fade={{ duration: FADE_DURATION }}>
                   {angles[i].toFixed(2)}&deg;
                 </span>
@@ -258,7 +265,7 @@
     </div>
     <div class="right-column">
       <div class="canvas-wrap">
-        <canvas bind:this={canvas} width="300" height="300"></canvas>
+        <canvas bind:this={canvas} width="600" height="600"></canvas>
       </div>
     </div>
   </div>
@@ -270,14 +277,18 @@
     --accent-color-light: hsl(280, 100%, 50%);
     --accent-color-dark: hsl(280, 100%, 70%);
     --bg-color-light: white;
-    --bg-color-dark: rgb(31, 31, 31); /* recommmended bg for dark mode */
+    --bg-color-dark: hsl(0, 0%, 12%); /* rgb(31,31,31) = #1f1f1f recommmended bg for dark mode */
+    --text-color-light: hsl(40, 20%, 10%); /* #1c1a17 */
+    --text-color-dark: hsl(40, 20%, 90%);
     --button-bg-color-light: hsl(0, 0%, 90%);
     --button-bg-color-dark: hsl(0, 0%, 30%);
-    --button-hover-bg-color-light: hsl(0, 0%, 80%);
+    --button-hover-bg-color-light: hsl(40, 20%, 80%);
     --button-hover-bg-color-dark: hsl(0, 0%, 40%);
-    --button-pressed-bg-color-light: hsl(0, 0%, 70%);
+    --button-pressed-bg-color-light: hsl(40, 20%, 70%);
     --button-pressed-bg-color-dark: hsl(0, 0%, 50%);
-    --text-color: light-dark(black, white);
+    --title-text-color-light: hsl(40, 40%, 15%);
+    --answer-text-color-light: hsl(40, 30%, 15%);
+    --text-color: light-dark(var(--text-color-light), var(--text-color-dark));
     --bg-color: light-dark(var(--bg-color-light), var(--bg-color-dark));
     --accent-color: light-dark(var(--accent-color-light), var(--accent-color-dark));
     --button-bg-color: light-dark(var(--button-bg-color-light), var(--button-bg-color-dark));
@@ -289,6 +300,8 @@
       var(--button-pressed-bg-color-light),
       var(--button-pressed-bg-color-dark)
     );
+    --title-text-color: light-dark(var(--title-text-color-light), var(--text-color-dark));
+    --answer-text-color: light-dark(var(--answer-text-color-light), var(--text-color-dark));
     --default-font-family: 'Noto Sans Math, sans-serif';
     --default-font-size: 18px;
     color: var(--text-color);
@@ -327,7 +340,7 @@
   }
 
   .github-link-dark {
-    background-image: url("data:image/svg+xml,%3csvg%20width='98'%20height='96'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M48.854%200C21.839%200%200%2022%200%2049.217c0%2021.756%2013.993%2040.172%2033.405%2046.69%202.427.49%203.316-1.059%203.316-2.362%200-1.141-.08-5.052-.08-9.127-13.59%202.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015%204.934.326%207.523%205.052%207.523%205.052%204.367%207.496%2011.404%205.378%2014.235%204.074.404-3.178%201.699-5.378%203.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283%200-5.378%201.94-9.778%205.014-13.2-.485-1.222-2.184-6.275.486-13.038%200%200%204.125-1.304%2013.426%205.052a46.97%2046.97%200%200%201%2012.214-1.63c4.125%200%208.33.571%2012.213%201.63%209.302-6.356%2013.427-5.052%2013.427-5.052%202.67%206.763.97%2011.816.485%2013.038%203.155%203.422%205.015%207.822%205.015%2013.2%200%2018.905-11.404%2023.06-22.324%2024.283%201.78%201.548%203.316%204.481%203.316%209.126%200%206.6-.08%2011.897-.08%2013.526%200%201.304.89%202.853%203.316%202.364%2019.412-6.52%2033.405-24.935%2033.405-46.691C97.707%2022%2075.788%200%2048.854%200z'%20fill='%23ffffff'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg%20width='98'%20height='96'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M48.854%200C21.839%200%200%2022%200%2049.217c0%2021.756%2013.993%2040.172%2033.405%2046.69%202.427.49%203.316-1.059%203.316-2.362%200-1.141-.08-5.052-.08-9.127-13.59%202.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015%204.934.326%207.523%205.052%207.523%205.052%204.367%207.496%2011.404%205.378%2014.235%204.074.404-3.178%201.699-5.378%203.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283%200-5.378%201.94-9.778%205.014-13.2-.485-1.222-2.184-6.275.486-13.038%200%200%204.125-1.304%2013.426%205.052a46.97%2046.97%200%200%201%2012.214-1.63c4.125%200%208.33.571%2012.213%201.63%209.302-6.356%2013.427-5.052%2013.427-5.052%202.67%206.763.97%2011.816.485%2013.038%203.155%203.422%205.015%207.822%205.015%2013.2%200%2018.905-11.404%2023.06-22.324%2024.283%201.78%201.548%203.316%204.481%203.316%209.126%200%206.6-.08%2011.897-.08%2013.526%200%201.304.89%202.853%203.316%202.364%2019.412-6.52%2033.405-24.935%2033.405-46.691C97.707%2022%2075.788%200%2048.854%200z'%20fill='%23f0f0f0'/%3e%3c/svg%3e");
   }
 
   .light-dark-toggle {
@@ -362,6 +375,10 @@
     justify-content: top;
   }
 
+  h1 {
+    color: var(--title-text-color);
+  }
+
   .calcs {
     padding-left: 24px;
     padding-right: 24px;
@@ -384,7 +401,15 @@
     height: 1px;
   }
 
-  .side-label {
+  .label-for-input-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: end;
+    margin-bottom: 0.1em;
+  }
+
+  .side-label-wrap {
     grid-column: 1;
     grid-row-start: span 2;
   }
@@ -394,7 +419,7 @@
     grid-row-start: span 2;
   }
 
-  .angle-label {
+  .angle-label-wrap {
     grid-column: 4;
     grid-row-start: span 2;
   }
@@ -447,6 +472,8 @@
     margin-right: 16px;
     font-size: 16px;
     background-color: var(--button-bg-color);
+    color: var(--text-color);
+    border-color: var(--text-color);
     border: solid;
     border-radius: 4px;
     border-width: 1px;
@@ -477,6 +504,10 @@
     border-color: var(--accent-color);
     padding-left: 4px;
     padding-right: 12px;
+  }
+
+  #answer {
+    color: var(--answer-text-color);
   }
 
   .right-column {
