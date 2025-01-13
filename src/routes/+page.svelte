@@ -161,7 +161,8 @@
 
   function toRegularPolygon() {
     const n = polygon.sides.length
-    const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2))
+    //const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2))
+    const angle = calculateRegularPolygonAngle(n)
     const sideLength = polygon.sides[0] ?? 1
     for (let i = 0; i < n; i++) {
       polygon.sides[i] = sideLength

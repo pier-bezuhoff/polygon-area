@@ -245,7 +245,7 @@ export function calculateArea(vertices: Vertex[]): Area {
 }
 
 export function calculateRegularPolygonAngle(n: Size): Angle {
-  return ((((n - 2) * PI) / n) * 180) / PI
+  return ((n - 2) / n) * 180
 }
 
 export type Scaling = {
