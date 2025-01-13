@@ -149,8 +149,10 @@
 
   function addSide() {
     const defaultSideLength = 1
-    const firstNonInputAngle = angles[polygon.angles.length] ?? 120
-    polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)))
+    if (polygon.sides.length >= 3) {
+      const firstNonInputAngle = angles[polygon.angles.length] ?? 120
+      polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)))
+    }
     polygon.sides.push(defaultSideLength)
   }
 
