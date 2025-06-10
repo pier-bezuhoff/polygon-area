@@ -17,3 +17,5 @@ Triangle requires 0 additional angles, quadrilateral — 1, pentagon — 2, hexa
 Out of 2 possible configurations of vertices chosen one without self-crossing edges and preferably convex.  
 When no valid polygon is possible given inputted parameters, it will appear open and no area is returned.
 
+## Screenshot
+![image](https://github.com/user-attachments/assets/ca1b1eab-4586-44d0-980e-0e9e7a8e91bf)
