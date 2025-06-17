@@ -78,6 +78,22 @@
     const newPolygon = polygon
     localStorage.setItem('polygon', JSON.stringify(newPolygon))
   })
+  let regualarPolygonMode: boolean = $state(false)
+  $effect(() => {
+    const locallySavedRegularPolygonMode = localStorage.getItem('regualarPolygonMode')
+    if (locallySavedRegularPolygonMode !== null) {
+      regualarPolygonMode = locallySavedRegularPolygonMode === 'true'
+    }
+  })
+  $effect(() => {
+    const newRegualarPolygonMode = regualarPolygonMode
+    localStorage.setItem('regualarPolygonMode', JSON.stringify(newRegualarPolygonMode))
+  })
+  $effect(() => {
+    if (regualarPolygonMode) {
+      toRegularPolygon()
+    }
+  })
   let vertices: Vertex[] = $derived(calculatePolygonVertices(polygon))
   let angles: Angle[] = $derived.by(() => {
     const allAngles = calculateAngles(vertices)
@@ -154,18 +170,23 @@
       polygon.angles.push(parseFloat(firstNonInputAngle.toFixed(2)))
     }
     polygon.sides.push(defaultSideLength)
+    if (regualarPolygonMode) {
+      toRegularPolygon()
+    }
   }
 
   function deleteSide() {
     polygon.sides.pop()
     polygon.angles.pop()
+    if (regualarPolygonMode) {
+      toRegularPolygon()
+    }
   }
 
   function toRegularPolygon() {
     const n = polygon.sides.length
-    //const angle = parseFloat(calculateRegularPolygonAngle(n).toFixed(2))
     const angle = calculateRegularPolygonAngle(n)
-    const sideLength = polygon.sides[0] ?? 1
+    const sideLength = polygon.sides[0] ?? null
     for (let i = 0; i < n; i++) {
       polygon.sides[i] = sideLength
       if (i < polygon.angles.length) {
@@ -208,14 +229,18 @@
               </label>
             </div>
             <span class="side-value">
-              <input
-                class="side-input"
-                id="side-input-{i}"
-                type="number"
-                bind:value={polygon.sides[i]}
-              />
+              {#if i == 0 || !regualarPolygonMode}
+                <input
+                  class="side-input"
+                  id="side-input-{i}"
+                  type="number"
+                  bind:value={polygon.sides[i]}
+                />
+              {:else}
+                {polygon.sides[i]}
+              {/if}
             </span>
-            {#if polygon.angles.length > i}
+            {#if polygon.angles.length > i && !regualarPolygonMode}
               <div class="label-for-input-wrap angle-label-wrap">
                 <label class="angle-label" for="angle-input-{i}">
                   {mkAngleName(i, polygon.sides.length)}
@@ -252,9 +277,10 @@
           <button type="button" class="control-button" onclick={deleteSide}>
             Delete last side
           </button>
-          <button type="button" class="control-button" onclick={toRegularPolygon}>
+          <label>
+            <input type="checkbox" bind:checked={regualarPolygonMode} />
             Regular polygon
-          </button>
+          </label>
         </div>
         {#if area != null}
           <div class="result-wrap" transition:fade={{ duration: FADE_DURATION }}>
@@ -420,6 +446,7 @@
   .side-value {
     grid-column: 2;
     grid-row-start: span 2;
+    color: var(--accent-color);
   }
 
   .angle-label-wrap {
