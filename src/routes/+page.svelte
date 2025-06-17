@@ -188,7 +188,7 @@
     const angle = calculateRegularPolygonAngle(n)
     const sideLength = polygon.sides[0] ?? null
     for (let i = 0; i < n; i++) {
-      polygon.sides[i] = sideLength
+      polygon.sides[i] = sideLength ?? polygon.sides[i]
       if (i < polygon.angles.length) {
         polygon.angles[i] = angle
       }
