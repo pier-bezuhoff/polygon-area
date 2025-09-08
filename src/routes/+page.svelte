@@ -285,9 +285,9 @@
         {#if area != null}
           <div class="result-wrap" transition:fade={{ duration: FADE_DURATION }}>
             <hr class="result-separator" />
-            <h2 id="answer">
+            <output id="answer" name="area">
               Area <i>S</i> = <i class="actual-area">{area.toPrecision(6)}</i>
-            </h2>
+            </output>
           </div>
         {/if}
       </div>
@@ -537,7 +537,10 @@
   }
 
   #answer {
+    margin-top: 0.83em;
     color: var(--answer-text-color);
+    font-size: 1.5em;
+    font-weight: bold;
   }
 
   .right-column {
